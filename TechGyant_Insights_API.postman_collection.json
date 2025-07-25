@@ -1,0 +1,115 @@
+{
+  "info": {
+    "name": "TechGyant Insights API",
+    "description": "African tech startup investment recommendation API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://your-api-url.onrender.com",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Nigeria Startups",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/recommendations/country/Nigeria",
+          "host": ["{{base_url}}"],
+          "path": ["recommendations", "country", "Nigeria"]
+        }
+      }
+    },
+    {
+      "name": "FinTech Startups",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/recommendations/sector/FinTech",
+          "host": ["{{base_url}}"],
+          "path": ["recommendations", "sector", "FinTech"]
+        }
+      }
+    },
+    {
+      "name": "Kenya AgriTech",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/recommendations/country/Kenya/sector/AgriTech",
+          "host": ["{{base_url}}"],
+          "path": ["recommendations", "country", "Kenya", "sector", "AgriTech"]
+        }
+      }
+    },
+    {
+      "name": "Top Countries",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/recommendations/top-countries?limit=5",
+          "host": ["{{base_url}}"],
+          "path": ["recommendations", "top-countries"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "5"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Africa Overview",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/recommendations/africa-overview",
+          "host": ["{{base_url}}"],
+          "path": ["recommendations", "africa-overview"]
+        }
+      }
+    },
+    {
+      "name": "Predict Startup",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"country\": \"Rwanda\",\n  \"sector\": \"FinTech\",\n  \"problem_addressed\": \"Financial Inclusion\",\n  \"founder_education_score\": 8.5,\n  \"founder_experience_years\": 5.2,\n  \"founder_network_score\": 7.3,\n  \"article_mentions\": 12,\n  \"keyword_relevance_score\": 8.7,\n  \"sentiment_score\": 0.75,\n  \"customer_testimonials\": 8,\n  \"user_satisfaction_score\": 8.9,\n  \"market_size_estimate\": 50000000,\n  \"problem_country_alignment\": 9.2,\n  \"months_in_operation\": 18,\n  \"team_size\": 12,\n  \"funding_raised\": 250000,\n  \"social_media_followers\": 5000,\n  \"media_coverage_count\": 6\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/predict",
+          "host": ["{{base_url}}"],
+          "path": ["predict"]
+        }
+      }
+    }
+  ]
+}

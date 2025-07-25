@@ -1,0 +1,10 @@
+{
+  "techgyant_base_url": "https://techgyant.com",
+  "update_interval_hours": 6,
+  "max_articles_per_run": 50,
+  "respect_robots_txt": true,
+  "request_delay_seconds": 2,
+  "retry_attempts": 3,
+  "log_level": "INFO",
+  "monitoring_enabled": true
+}
