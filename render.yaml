@@ -2,8 +2,8 @@ services:
   - type: web
     name: techgyant-insights-api
     env: python
-    buildCommand: pip install --upgrade pip==23.3.1 setuptools==69.5.1 wheel==0.43.0 && pip install -r requirements-minimal.txt
-    startCommand: python setup_and_run.py && uvicorn api.main_minimal:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r requirements-deploy.txt
+    startCommand: python simple_setup.py && uvicorn api.main_simple:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
