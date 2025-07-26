@@ -98,19 +98,18 @@ def load_startup_data():
     """Load startup data"""
     global startup_data
     
-    data_files = [
-        "data/raw/techgyant_combined_dataset.csv",
-        "data/raw/techgyant_real_startups.csv"
-    ]
+    # Load only real startup data
+    data_file = "data/raw/techgyant_real_startups.csv"
     
-    for file_path in data_files:
-        if os.path.exists(file_path):
-            try:
-                startup_data = pd.read_csv(file_path)
-                logger.info(f"Loaded startup data from {file_path}")
-                break
-            except Exception as e:
-                logger.error(f"Error loading {file_path}: {e}")
+    if os.path.exists(data_file):
+        try:
+            startup_data = pd.read_csv(data_file)
+            logger.info(f"Loaded startup data from {data_file}")
+        except Exception as e:
+            logger.error(f"Error loading {data_file}: {e}")
+            startup_data = None
+    else:
+        startup_data = None
     
     if startup_data is None:
         # Create dummy data for deployment

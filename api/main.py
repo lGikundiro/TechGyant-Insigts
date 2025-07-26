@@ -16,7 +16,7 @@ warnings.filterwarnings('ignore')
 # FastAPI imports
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
 # Import our models
@@ -75,17 +75,12 @@ def load_startup_data():
     
     if startup_data is None:
         try:
-            # Try to load the combined dataset first
-            data_path = os.path.join(os.path.dirname(__file__), "..", "data", "raw", "techgyant_combined_dataset.csv")
+            # Load only real startup data
+            data_path = os.path.join(os.path.dirname(__file__), "..", "data", "raw", "techgyant_real_startups.csv")
             if os.path.exists(data_path):
                 startup_data = pd.read_csv(data_path)
             else:
-                # Fall back to real data only
-                data_path = os.path.join(os.path.dirname(__file__), "..", "data", "raw", "techgyant_real_startups.csv")
-                if os.path.exists(data_path):
-                    startup_data = pd.read_csv(data_path)
-                else:
-                    startup_data = pd.DataFrame()  # Empty dataframe if no data
+                startup_data = pd.DataFrame()  # Empty dataframe if no data
             
             print(f"Loaded {len(startup_data)} startups for recommendations")
         except Exception as e:
@@ -280,6 +275,15 @@ async def health_check():
         model_loaded=PREDICTOR_AVAILABLE,
         timestamp=datetime.now().isoformat()
     )
+
+@app.get("/favicon.ico")
+async def favicon():
+    """Serve TechGyant logo as favicon"""
+    favicon_path = os.path.join(os.path.dirname(__file__), "..", "static", "favicon.png")
+    if os.path.exists(favicon_path):
+        return FileResponse(favicon_path, media_type="image/png")
+    else:
+        return {"error": "Favicon not found"}
 
 @app.post("/predict", response_model=PredictionResponse)
 async def predict_startup(request: StartupPredictionRequest):

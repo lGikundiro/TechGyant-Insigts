@@ -251,15 +251,15 @@ if __name__ == "__main__":
     # Initialize preprocessor
     preprocessor = DataPreprocessor()
     
-    # First generate data if it doesn't exist
-    if not os.path.exists("data/raw/techgyant_startups.csv"):
-        print("Generating dataset first...")
-        from data_generation import create_synthetic_startup_data, save_dataset
-        df = create_synthetic_startup_data(1000)
-        save_dataset(df, "data/raw/techgyant_startups.csv")
+    # Load real startup data only
+    real_data_path = "data/raw/techgyant_real_startups.csv"
+    if not os.path.exists(real_data_path):
+        print(f"Error: Real data file not found at {real_data_path}")
+        print("Please ensure the real startup data file exists.")
+        exit(1)
     
-    # Load and process data
-    df = preprocessor.load_data("data/raw/techgyant_startups.csv")
+    # Load and process real data
+    df = preprocessor.load_data(real_data_path)
     
     # Explore data
     df_explored = preprocessor.explore_data()

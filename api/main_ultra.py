@@ -5,6 +5,7 @@ Zero external dependencies beyond FastAPI
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import List
 import os
@@ -115,6 +116,15 @@ async def health_check():
         "python_version": "3.11.9",
         "environment": "production"
     }
+
+@app.get("/favicon.ico")
+async def favicon():
+    """Serve TechGyant logo as favicon"""
+    favicon_path = os.path.join(os.path.dirname(__file__), "..", "static", "favicon.png")
+    if os.path.exists(favicon_path):
+        return FileResponse(favicon_path, media_type="image/png")
+    else:
+        return {"error": "Favicon not found"}
 
 @app.post("/predict", response_model=InvestmentPrediction)
 async def predict_investment(startup: StartupInput):
