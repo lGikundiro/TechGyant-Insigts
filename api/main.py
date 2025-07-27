@@ -20,7 +20,7 @@ from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
 # Import our models
-from models import (
+from api.models import (
     StartupPredictionRequest, 
     PredictionResponse, 
     BatchPredictionRequest, 
@@ -242,16 +242,11 @@ async def root():
                 <p>Comprehensive overview of investment opportunities across Africa</p>
             </div>
             
-            <h2>� Data Access Endpoints</h2>
+            <h2>🔧 API Options & Data Access</h2>
             
             <div class="endpoint">
-                <div class="method">GET /data/countries</div>
-                <p>Get all analyzed countries with statistics and metrics</p>
-            </div>
-            
-            <div class="endpoint">
-                <div class="method">GET /data/sectors</div>
-                <p>Get all analyzed sectors with statistics and metrics</p>
+                <div class="method">GET /options</div>
+                <p>Get available countries, sectors, and combinations for input validation</p>
             </div>
             
             <div class="endpoint">
@@ -468,13 +463,23 @@ async def get_country_recommendations(country: str, min_score: float = 60.0):
     """
     Get recommended startups by country
     
-    Returns startups in the specified country with readiness score >= min_score
+    Returns startups in the specified country with readiness score >= min_score.
+    Use GET /options to see available countries.
     """
     try:
         data = load_startup_data()
         
         if data.empty:
             raise HTTPException(status_code=404, detail="No startup data available")
+        
+        # Enhanced validation - check if country exists
+        available_countries = data['country'].unique()
+        if country.lower() not in [c.lower() for c in available_countries]:
+            available_list = sorted(available_countries.tolist())
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Country '{country}' not found. Available countries: {available_list}. Use GET /options for full details."
+            )
         
         # Filter by country (case insensitive)
         country_data = data[data['country'].str.lower() == country.lower()]
@@ -495,7 +500,7 @@ async def get_country_recommendations(country: str, min_score: float = 60.0):
         startups = [format_startup_recommendation(row) for _, row in recommended.iterrows()]
         
         return CountryRecommendationsResponse(
-            country=country.title(),
+            country=country_data['country'].iloc[0],  # Use exact case from data
             total_startups=len(country_data),
             recommended_startups=len(recommended),
             average_readiness_score=round(country_data['investor_readiness_score'].mean(), 2),
@@ -513,13 +518,23 @@ async def get_sector_recommendations(sector: str, min_score: float = 60.0):
     """
     Get recommended startups by sector
     
-    Returns startups in the specified sector with readiness score >= min_score
+    Returns startups in the specified sector with readiness score >= min_score.
+    Use GET /options to see available sectors.
     """
     try:
         data = load_startup_data()
         
         if data.empty:
             raise HTTPException(status_code=404, detail="No startup data available")
+        
+        # Enhanced validation - check if sector exists
+        available_sectors = data['sector'].unique()
+        if sector.lower() not in [s.lower() for s in available_sectors]:
+            available_list = sorted(available_sectors.tolist())
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Sector '{sector}' not found. Available sectors: {available_list}. Use GET /options for full details."
+            )
         
         # Filter by sector (case insensitive)
         sector_data = data[data['sector'].str.lower() == sector.lower()]
@@ -540,7 +555,7 @@ async def get_sector_recommendations(sector: str, min_score: float = 60.0):
         startups = [format_startup_recommendation(row) for _, row in recommended.iterrows()]
         
         return SectorRecommendationsResponse(
-            sector=sector.title(),
+            sector=sector_data['sector'].iloc[0],  # Use exact case from data
             total_startups=len(sector_data),
             recommended_startups=len(recommended),
             average_readiness_score=round(sector_data['investor_readiness_score'].mean(), 2),
@@ -558,13 +573,32 @@ async def get_country_sector_recommendations(country: str, sector: str, min_scor
     """
     Get recommended startups by country AND sector
     
-    Returns startups in the specified country and sector with readiness score >= min_score
+    Returns startups in the specified country and sector with readiness score >= min_score.
+    Use GET /options to see available country-sector combinations.
     """
     try:
         data = load_startup_data()
         
         if data.empty:
             raise HTTPException(status_code=404, detail="No startup data available")
+        
+        # Enhanced validation - check if country exists
+        available_countries = data['country'].unique()
+        if country.lower() not in [c.lower() for c in available_countries]:
+            available_list = sorted(available_countries.tolist())
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Country '{country}' not found. Available countries: {available_list}"
+            )
+        
+        # Enhanced validation - check if sector exists
+        available_sectors = data['sector'].unique()
+        if sector.lower() not in [s.lower() for s in available_sectors]:
+            available_list = sorted(available_sectors.tolist())
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Sector '{sector}' not found. Available sectors: {available_list}"
+            )
         
         # Filter by both country and sector (case insensitive)
         filtered_data = data[
@@ -573,9 +607,13 @@ async def get_country_sector_recommendations(country: str, sector: str, min_scor
         ]
         
         if filtered_data.empty:
+            # Check what sectors are available in this country
+            country_data = data[data['country'].str.lower() == country.lower()]
+            available_sectors_in_country = sorted(country_data['sector'].unique().tolist())
+            
             raise HTTPException(
                 status_code=404, 
-                detail=f"No startups found for {sector} sector in {country}"
+                detail=f"No startups found for {sector} sector in {country}. Available sectors in {country}: {available_sectors_in_country}"
             )
         
         # Filter by minimum score
@@ -588,8 +626,8 @@ async def get_country_sector_recommendations(country: str, sector: str, min_scor
         startups = [format_startup_recommendation(row) for _, row in recommended.iterrows()]
         
         return CountrySectorRecommendationsResponse(
-            country=country.title(),
-            sector=sector.title(),
+            country=filtered_data['country'].iloc[0],  # Use exact case from data
+            sector=filtered_data['sector'].iloc[0],    # Use exact case from data
             total_startups=len(filtered_data),
             average_readiness_score=round(filtered_data['investor_readiness_score'].mean(), 2),
             startups=startups
@@ -702,15 +740,16 @@ async def get_africa_overview(min_score: float = 60.0, top_startups_limit: int =
         raise HTTPException(status_code=500, detail=f"Error getting Africa overview: {str(e)}")
 
 # ========================================
-# NEW DATA ACCESS ENDPOINTS
+# API OPTIONS AND DATA ACCESS ENDPOINTS
 # ========================================
 
-@app.get("/data/countries", response_model=List[dict])
-async def get_all_countries():
+@app.get("/options", response_model=dict)
+async def get_api_options():
     """
-    Get all analyzed countries with their statistics
+    Get all available filter options for the API
     
-    Returns a list of all countries in the dataset with basic metrics
+    Returns available countries, sectors, and their combinations for use in API requests.
+    Perfect for populating dropdown menus and input validation.
     """
     try:
         data = load_startup_data()
@@ -718,60 +757,50 @@ async def get_all_countries():
         if data.empty:
             raise HTTPException(status_code=404, detail="No startup data available")
         
-        countries_data = []
-        for country in sorted(data['country'].unique()):
+        # Get unique countries and sectors
+        available_countries = sorted(data['country'].unique().tolist())
+        available_sectors = sorted(data['sector'].unique().tolist())
+        
+        # Get country-sector combinations that actually exist in the data
+        combinations = []
+        for country in available_countries:
             country_data = data[data['country'] == country]
-            
-            countries_data.append({
+            country_sectors = sorted(country_data['sector'].unique().tolist())
+            combinations.append({
                 "country": country,
-                "total_startups": len(country_data),
-                "average_readiness_score": round(country_data['investor_readiness_score'].mean(), 2),
-                "highest_score": round(country_data['investor_readiness_score'].max(), 2),
-                "lowest_score": round(country_data['investor_readiness_score'].min(), 2),
-                "total_funding_raised": float(country_data['funding_raised'].sum()),
-                "sectors_count": country_data['sector'].nunique(),
-                "top_sector": country_data['sector'].value_counts().index[0] if not country_data.empty else "N/A"
+                "available_sectors": country_sectors,
+                "startup_count": len(country_data)
             })
         
-        return countries_data
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error getting countries data: {str(e)}")
-
-@app.get("/data/sectors", response_model=List[dict])
-async def get_all_sectors():
-    """
-    Get all analyzed sectors with their statistics
-    
-    Returns a list of all sectors in the dataset with basic metrics
-    """
-    try:
-        data = load_startup_data()
-        
-        if data.empty:
-            raise HTTPException(status_code=404, detail="No startup data available")
-        
-        sectors_data = []
-        for sector in sorted(data['sector'].unique()):
+        # Get sector-country combinations
+        sector_combinations = []
+        for sector in available_sectors:
             sector_data = data[data['sector'] == sector]
-            
-            sectors_data.append({
+            sector_countries = sorted(sector_data['country'].unique().tolist())
+            sector_combinations.append({
                 "sector": sector,
-                "total_startups": len(sector_data),
-                "average_readiness_score": round(sector_data['investor_readiness_score'].mean(), 2),
-                "highest_score": round(sector_data['investor_readiness_score'].max(), 2),
-                "lowest_score": round(sector_data['investor_readiness_score'].min(), 2),
-                "total_funding_raised": float(sector_data['funding_raised'].sum()),
-                "countries_count": sector_data['country'].nunique(),
-                "top_country": sector_data['country'].value_counts().index[0] if not sector_data.empty else "N/A",
-                "average_team_size": round(sector_data['team_size'].mean(), 1),
-                "average_months_operation": round(sector_data['months_in_operation'].mean(), 1)
+                "available_countries": sector_countries,
+                "startup_count": len(sector_data)
             })
         
-        return sectors_data
+        return {
+            "available_countries": available_countries,
+            "available_sectors": available_sectors,
+            "total_startups": len(data),
+            "countries_count": len(available_countries),
+            "sectors_count": len(available_sectors),
+            "country_sector_combinations": combinations,
+            "sector_country_combinations": sector_combinations,
+            "data_summary": {
+                "highest_score": round(data['investor_readiness_score'].max(), 2),
+                "lowest_score": round(data['investor_readiness_score'].min(), 2),
+                "average_score": round(data['investor_readiness_score'].mean(), 2),
+                "total_funding": float(data['funding_raised'].sum())
+            }
+        }
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error getting sectors data: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error getting API options: {str(e)}")
 
 @app.get("/data/companies", response_model=List[StartupRecommendation])
 async def get_all_companies(sort_by: str = "score", order: str = "desc", limit: int = 100):
