@@ -5,6 +5,12 @@
 ## Overview
 TechGyant Insights uses linear regression to predict investor readiness scores for African tech startups based on **real data extracted from TechGyant articles**, founder backgrounds, and market alignment data. The system automatically scrapes and updates data from the TechGyant website to ensure predictions are based on the latest startup information.
 
+## Mission
+Amplifying African tech ecosystem growth by contextual storytelling and connecting promising startups with global investors through data-driven insights.
+
+## Problem Statement
+African tech startups often lack global attention with 3% global media coverage. This affects the growth of potential but small startups. TechGyants will be fostered to be the voice of every startup, particularly small but promising ones, and be a go-to site for every investor to learn about startups through data-driven insights.
+
 ## Features
 - **Real TechGyant Data**: Automatically extracted from TechGyant website articles
 - **Linear Regression Model**: Predicts startup investment readiness scores
@@ -13,12 +19,6 @@ TechGyant Insights uses linear regression to predict investor readiness scores f
 - **Data Visualization**: Comprehensive analysis and model performance plots
 - **Model Comparison**: Linear Regression vs Decision Trees vs Random Forest
 - **Automated Data Updates**: Continuous monitoring and extraction of new TechGyant articles
-
-## Mission
-Amplifying African tech ecosystem growth by contextual storytelling and connecting promising startups with global investors through data-driven insights.
-
-## Problem Statement
-African tech startups often lack global attention with 3% global media coverage. This affects the growth of potential but small startups. TechGyants will be fostered to be the voice of every startup, particularly small but promising ones, and be a go-to site for every investor to learn about startups through data-driven insights.
 
 ## Real TechGyant Data
 This project uses **pure real data extracted from TechGyant articles** featuring:
