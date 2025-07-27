@@ -242,7 +242,29 @@ async def root():
                 <p>Comprehensive overview of investment opportunities across Africa</p>
             </div>
             
-            <h2>📖 Documentation</h2>
+            <h2>� Data Access Endpoints</h2>
+            
+            <div class="endpoint">
+                <div class="method">GET /data/countries</div>
+                <p>Get all analyzed countries with statistics and metrics</p>
+            </div>
+            
+            <div class="endpoint">
+                <div class="method">GET /data/sectors</div>
+                <p>Get all analyzed sectors with statistics and metrics</p>
+            </div>
+            
+            <div class="endpoint">
+                <div class="method">GET /data/companies</div>
+                <p>Get all analyzed companies/startups (sortable, filterable)</p>
+            </div>
+            
+            <div class="endpoint">
+                <div class="method">GET /data/top-recommended</div>
+                <p>Get top recommended startups based on investor readiness score</p>
+            </div>
+            
+            <h2>�📖 Documentation</h2>
             <ul>
                 <li><a href="/docs">Swagger UI Documentation</a></li>
                 <li><a href="/redoc">ReDoc Documentation</a></li>
@@ -678,6 +700,161 @@ async def get_africa_overview(min_score: float = 60.0, top_startups_limit: int =
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting Africa overview: {str(e)}")
+
+# ========================================
+# NEW DATA ACCESS ENDPOINTS
+# ========================================
+
+@app.get("/data/countries", response_model=List[dict])
+async def get_all_countries():
+    """
+    Get all analyzed countries with their statistics
+    
+    Returns a list of all countries in the dataset with basic metrics
+    """
+    try:
+        data = load_startup_data()
+        
+        if data.empty:
+            raise HTTPException(status_code=404, detail="No startup data available")
+        
+        countries_data = []
+        for country in sorted(data['country'].unique()):
+            country_data = data[data['country'] == country]
+            
+            countries_data.append({
+                "country": country,
+                "total_startups": len(country_data),
+                "average_readiness_score": round(country_data['investor_readiness_score'].mean(), 2),
+                "highest_score": round(country_data['investor_readiness_score'].max(), 2),
+                "lowest_score": round(country_data['investor_readiness_score'].min(), 2),
+                "total_funding_raised": float(country_data['funding_raised'].sum()),
+                "sectors_count": country_data['sector'].nunique(),
+                "top_sector": country_data['sector'].value_counts().index[0] if not country_data.empty else "N/A"
+            })
+        
+        return countries_data
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting countries data: {str(e)}")
+
+@app.get("/data/sectors", response_model=List[dict])
+async def get_all_sectors():
+    """
+    Get all analyzed sectors with their statistics
+    
+    Returns a list of all sectors in the dataset with basic metrics
+    """
+    try:
+        data = load_startup_data()
+        
+        if data.empty:
+            raise HTTPException(status_code=404, detail="No startup data available")
+        
+        sectors_data = []
+        for sector in sorted(data['sector'].unique()):
+            sector_data = data[data['sector'] == sector]
+            
+            sectors_data.append({
+                "sector": sector,
+                "total_startups": len(sector_data),
+                "average_readiness_score": round(sector_data['investor_readiness_score'].mean(), 2),
+                "highest_score": round(sector_data['investor_readiness_score'].max(), 2),
+                "lowest_score": round(sector_data['investor_readiness_score'].min(), 2),
+                "total_funding_raised": float(sector_data['funding_raised'].sum()),
+                "countries_count": sector_data['country'].nunique(),
+                "top_country": sector_data['country'].value_counts().index[0] if not sector_data.empty else "N/A",
+                "average_team_size": round(sector_data['team_size'].mean(), 1),
+                "average_months_operation": round(sector_data['months_in_operation'].mean(), 1)
+            })
+        
+        return sectors_data
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting sectors data: {str(e)}")
+
+@app.get("/data/companies", response_model=List[StartupRecommendation])
+async def get_all_companies(sort_by: str = "score", order: str = "desc", limit: int = 100):
+    """
+    Get all analyzed companies/startups
+    
+    Parameters:
+    - sort_by: Field to sort by ("score", "funding", "name", "country", "sector")
+    - order: Sort order ("asc" or "desc")
+    - limit: Maximum number of results to return
+    
+    Returns a list of all startups in the dataset
+    """
+    try:
+        data = load_startup_data()
+        
+        if data.empty:
+            raise HTTPException(status_code=404, detail="No startup data available")
+        
+        # Apply sorting
+        if sort_by == "score":
+            data = data.sort_values('investor_readiness_score', ascending=(order == "asc"))
+        elif sort_by == "funding":
+            data = data.sort_values('funding_raised', ascending=(order == "asc"))
+        elif sort_by == "name":
+            data = data.sort_values('startup_name', ascending=(order == "asc"))
+        elif sort_by == "country":
+            data = data.sort_values('country', ascending=(order == "asc"))
+        elif sort_by == "sector":
+            data = data.sort_values('sector', ascending=(order == "asc"))
+        else:
+            # Default to score descending
+            data = data.sort_values('investor_readiness_score', ascending=False)
+        
+        # Apply limit
+        limited_data = data.head(limit)
+        
+        # Format startups
+        startups = [format_startup_recommendation(row) for _, row in limited_data.iterrows()]
+        
+        return startups
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting companies data: {str(e)}")
+
+@app.get("/data/top-recommended", response_model=List[StartupRecommendation])
+async def get_top_recommended_startups(min_score: float = 70.0, limit: int = 20):
+    """
+    Get top recommended startups based on investor readiness score
+    
+    Parameters:
+    - min_score: Minimum investor readiness score (default: 70.0)
+    - limit: Maximum number of results to return (default: 20)
+    
+    Returns the highest-rated startups that meet the minimum score threshold
+    """
+    try:
+        data = load_startup_data()
+        
+        if data.empty:
+            raise HTTPException(status_code=404, detail="No startup data available")
+        
+        # Filter by minimum score
+        recommended = data[data['investor_readiness_score'] >= min_score]
+        
+        if recommended.empty:
+            raise HTTPException(
+                status_code=404, 
+                detail=f"No startups found with score >= {min_score}"
+            )
+        
+        # Sort by readiness score (descending) and apply limit
+        top_recommended = recommended.nlargest(limit, 'investor_readiness_score')
+        
+        # Format startups
+        startups = [format_startup_recommendation(row) for _, row in top_recommended.iterrows()]
+        
+        return startups
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting top recommended startups: {str(e)}")
 
 # Error handlers
 @app.exception_handler(ValueError)
