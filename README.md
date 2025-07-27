@@ -23,7 +23,7 @@ African tech startups often lack global attention with 3% global media coverage.
 ## Real TechGyant Data
 This project uses **pure real data extracted from TechGyant articles** featuring:
 - **15 verified African tech startups** (Flutterwave, M-KOPA, Moove, Lemfi, Academic Bridge, Strettch, etc.)
-- **Automated extraction** from https://techgyant.com/articles/
+- **Automated extraction** from https://techgyant.com/
 - **Continuous dataset updates** when new articles are published
 - **Rich features** including funding data, team info, market alignment, and more
 - **No synthetic data** - only authentic startup information
