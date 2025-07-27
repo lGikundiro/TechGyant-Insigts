@@ -41,13 +41,16 @@ TechGyantInsights/
 ```
 
 ## Mission
-Empower African tech ecosystem growth by connecting promising startups with global investors through data-driven insights.
+Amplifying African tech ecosystem growth by contextual storytelling and connecting promising startups with global investors through data-driven insights.
+
+## Problem Statement
+African tech startups often lack global attention with 3% global media coverage. This affects the growth of potential but small startups. TechGyants will be fostered to be the voice of every startup, particularly small but promising ones, and be a go-to site for every investor to learn about startups through data-driven insights.
 
 ## Real TechGyant Data
 This project uses **pure real data extracted from TechGyant articles** featuring:
-- **16+ verified African tech startups** (Flutterwave, M-KOPA, Moove, Lemfi, etc.)
+- **15 verified African tech startups** (Flutterwave, M-KOPA, Moove, Lemfi, Academic Bridge, Strettch, etc.)
 - **Automated extraction** from https://techgyant.com/articles/
-- **Continuous updates** when new articles are published
+- **Continuous dataset updates** when new articles are published
 - **Rich features** including funding data, team info, market alignment, and more
 - **No synthetic data** - only authentic startup information
 
@@ -57,3 +60,10 @@ This project uses **pure real data extracted from TechGyant articles** featuring
 - 🇳🇬 **Moove** - FinTech (Supply Chain) - $600M funding
 - 🇷🇼 **Ampersand** - CleanTech (Energy Access) - $21.5M funding
 - 🇬🇭 **Kofa** - CleanTech (Energy Access) - $8M funding
+
+### Limitation:
+TechGyant Insights predictions do not offer a percentage investment-worthy score of a startup in its specific sector or country due to data limitation at the moment. However, it's the next near future enhancement.
+
+### API Documentation:
+https://techgyant-insigts.onrender.com/docs
+  
