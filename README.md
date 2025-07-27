@@ -66,4 +66,6 @@ TechGyantInsights/
 │   └── exploratory_analysis.ipynb  # Data exploration
 └── visualizations/            # Generated plots and charts
 ```
-  
+
+Mobile Application GitHub:
+https://github.com/lGikundiro/TechGyant-Insights-Mobile-App.git
