@@ -138,44 +138,30 @@ def test_predictions():
     return pd.DataFrame(results)
 
 def create_visualizations(df):
-    """Create a professional, clean dashboard with zero overlapping content"""
+    """Create a completely redesigned, clean dashboard with zero overlapping"""
     
-    # Set matplotlib parameters for better text rendering
-    plt.rcParams.update({
-        'font.size': 12,
-        'axes.titlesize': 16,
-        'axes.labelsize': 14,
-        'xtick.labelsize': 11,
-        'ytick.labelsize': 11,
-        'legend.fontsize': 12,
-        'figure.titlesize': 24
-    })
+    # Create multiple separate figures for clean layout
     
-    # FIGURE 1: Main Investment Dashboard
-    fig1 = plt.figure(figsize=(24, 16), facecolor='white')
-    
-    # Add main title with proper spacing
+    # FIGURE 1: Main Investment Analysis
+    fig1 = plt.figure(figsize=(20, 12), facecolor='white')
     fig1.suptitle('TechGyant Insights - Investment Prediction Analysis', 
-                  fontsize=28, fontweight='bold', y=0.96, 
-                  color=TECHGYANT_COLORS['primary'],
-                  bbox=dict(boxstyle="round,pad=0.5", facecolor='white', 
-                           edgecolor=TECHGYANT_COLORS['primary'], linewidth=2))
+                  fontsize=24, fontweight='bold', y=0.95, 
+                  color=TECHGYANT_COLORS['primary'])
     
-    # Create clean grid layout with more spacing
-    gs1 = fig1.add_gridspec(3, 2, hspace=0.7, wspace=0.4, top=0.88, bottom=0.08, 
-                           left=0.06, right=0.96, height_ratios=[2.5, 1.5, 1.2])
+    # Create clean grid layout
+    gs1 = fig1.add_gridspec(2, 2, hspace=0.4, wspace=0.3, top=0.88, bottom=0.1, 
+                           left=0.08, right=0.95)
     
-    # 1. Investment Predictions - Top Row (Full Width) - MAIN CHART
+    # 1. Investment Predictions - Top Left (Large)
     ax1 = fig1.add_subplot(gs1[0, :])  # Spans both columns at top
     
-    # Create very short, clean company names
+    # Create short, clean company names
     short_names = []
     for i, row in df.iterrows():
-        sector = row['sector'][:5]  # First 5 chars of sector
-        country = row['country'][:3].upper()  # First 3 chars of country
+        sector = row['sector'][:6]  # First 6 chars of sector
+        country = row['country'][:3]  # First 3 chars of country
         short_names.append(f"{sector}\n{country}")
     
-    # Professional color palette
     colors = [TECHGYANT_COLORS['primary'], TECHGYANT_COLORS['secondary'], 
               TECHGYANT_COLORS['accent'], TECHGYANT_COLORS['success'],
               TECHGYANT_COLORS['info'], TECHGYANT_COLORS['warning']]
@@ -184,19 +170,18 @@ def create_visualizations(df):
     plot_colors = (colors * ((len(df) // len(colors)) + 1))[:len(df)]
     
     bars = ax1.bar(range(len(df)), df['predicted_investment'], 
-                   color=plot_colors, alpha=0.85, edgecolor='white', linewidth=3,
-                   width=0.7)  # Reduce bar width for better spacing
+                   color=plot_colors, alpha=0.85, edgecolor='white', linewidth=2)
     
-    ax1.set_title('💰 Investment Predictions by African Tech Startups', 
-                  fontsize=20, fontweight='bold', pad=40, color=TECHGYANT_COLORS['primary'])
-    ax1.set_xlabel('African Tech Startups', fontweight='bold', fontsize=16, labelpad=15)
-    ax1.set_ylabel('Predicted Investment (USD)', fontweight='bold', fontsize=16, labelpad=15)
+    ax1.set_title('💰 Investment Predictions by Startup', 
+                  fontsize=18, fontweight='bold', pad=30, color=TECHGYANT_COLORS['primary'])
+    ax1.set_xlabel('African Tech Startups', fontweight='bold', fontsize=14)
+    ax1.set_ylabel('Predicted Investment (USD)', fontweight='bold', fontsize=14)
     
     # Set clean x-axis labels with proper spacing
     ax1.set_xticks(range(len(df)))
-    ax1.set_xticklabels(short_names, fontsize=12, ha='center', fontweight='bold')
+    ax1.set_xticklabels(short_names, fontsize=10, ha='center')
     
-    # Add value labels with smart positioning - NO OVERLAP
+    # Add value labels with smart positioning
     for i, bar in enumerate(bars):
         height = bar.get_height()
         if height >= 1000000:
@@ -204,18 +189,15 @@ def create_visualizations(df):
         else:
             label = f'${height/1000:.0f}K'
         
-        # Position label well above bar with large margin
-        ax1.text(bar.get_x() + bar.get_width()/2., height + height*0.08,
+        # Position label above bar with margin
+        ax1.text(bar.get_x() + bar.get_width()/2., height + height*0.03,
                 label, ha='center', va='bottom', fontweight='bold', 
-                fontsize=13, color=TECHGYANT_COLORS['dark'],
-                bbox=dict(boxstyle="round,pad=0.3", facecolor='white', 
-                         edgecolor=bar.get_facecolor(), alpha=0.8))
+                fontsize=11, color=TECHGYANT_COLORS['dark'])
     
-    # Format y-axis nicely
+    # Format y-axis
     ax1.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x/1e6:.1f}M'))
-    ax1.grid(True, alpha=0.2, axis='y', linestyle='-', linewidth=0.5)
+    ax1.grid(True, alpha=0.3, axis='y', linestyle='--')
     ax1.set_facecolor('#FAFBFC')
-    ax1.margins(x=0.05, y=0.15)  # Add margins to prevent crowding
     
     # 2. Confidence & Risk Analysis - Bottom Left
     ax2 = fig1.add_subplot(gs1[1, 0])

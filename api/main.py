@@ -288,10 +288,14 @@ async def favicon():
 @app.post("/predict", response_model=PredictionResponse)
 async def predict_startup(request: StartupPredictionRequest):
     """
-    Predict investor readiness score for a single startup
+    Predict investor readiness score for a startup based on country and/or sector
     
-    Returns a score from 0-100 indicating how ready the startup is for investment,
-    along with confidence intervals and recommendations.
+    Request can contain:
+    - Only country
+    - Only sector  
+    - Both country and sector
+    
+    Returns a score from 0-100 indicating how ready the startup is for investment.
     """
     
     if not PREDICTOR_AVAILABLE or predictor is None:
@@ -300,11 +304,23 @@ async def predict_startup(request: StartupPredictionRequest):
             detail="ML model not available. Please ensure the model has been trained and loaded."
         )
     
+    # Validate that at least one field is provided
+    if not request.country and not request.sector:
+        raise HTTPException(
+            status_code=400,
+            detail="At least one of 'country' or 'sector' must be provided"
+        )
+    
     try:
-        # Convert request to dictionary
-        startup_data = request.dict()
+        # Convert request to dictionary with only provided fields
+        startup_data = {}
+        if request.country:
+            startup_data['country'] = request.country.value
+        if request.sector:
+            startup_data['sector'] = request.sector.value
         
-        # Make prediction
+        # For missing fields, use default/average values for prediction
+        # This would need to be implemented in your prediction service
         result = predictor.predict_with_confidence(startup_data)
         
         # Get risk level and recommendation
