@@ -14,32 +14,6 @@ TechGyant Insights uses linear regression to predict investor readiness scores f
 - **Model Comparison**: Linear Regression vs Decision Trees vs Random Forest
 - **Automated Data Updates**: Continuous monitoring and extraction of new TechGyant articles
 
-## Project Structure
-```
-TechGyantInsights/
-├── data/
-│   ├── raw/                    # Real TechGyant startup data
-│   │   └── techgyant_real_startups.csv     # Pure real dataset (16+ startups)
-│   ├── processed/              # Cleaned and engineered features
-│   ├── models/                 # Saved model files
-│   └── monitoring/             # Data extraction configs and logs
-├── src/
-│   ├── techgyant_data_extractor.py  # Automated web scraping
-│   ├── real_data_extractor.py       # Data extraction utilities
-│   ├── data_preprocessing.py         # Data cleaning and feature engineering
-│   ├── model_training.py             # Model training and evaluation
-│   ├── model_comparison.py           # Compare different algorithms
-│   └── prediction_service.py         # Prediction functions
-├── api/
-│   ├── main.py                # FastAPI application
-│   ├── models.py              # Pydantic models
-│   └── requirements.txt       # Dependencies
-├── logs/                      # Extraction and system logs
-├── notebooks/
-│   └── exploratory_analysis.ipynb  # Data exploration
-└── visualizations/            # Generated plots and charts
-```
-
 ## Mission
 Amplifying African tech ecosystem growth by contextual storytelling and connecting promising startups with global investors through data-driven insights.
 
@@ -66,4 +40,30 @@ TechGyant Insights predictions do not offer a percentage investment-worthy score
 
 ### API Documentation:
 https://techgyant-insigts.onrender.com/docs
+
+## Project Structure
+```
+TechGyantInsights/
+├── data/
+│   ├── raw/                    # Real TechGyant startup data
+│   │   └── techgyant_real_startups.csv     # Pure real dataset (16+ startups)
+│   ├── processed/              # Cleaned and engineered features
+│   ├── models/                 # Saved model files
+│   └── monitoring/             # Data extraction configs and logs
+├── src/
+│   ├── techgyant_data_extractor.py  # Automated web scraping
+│   ├── real_data_extractor.py       # Data extraction utilities
+│   ├── data_preprocessing.py         # Data cleaning and feature engineering
+│   ├── model_training.py             # Model training and evaluation
+│   ├── model_comparison.py           # Compare different algorithms
+│   └── prediction_service.py         # Prediction functions
+├── api/
+│   ├── main.py                # FastAPI application
+│   ├── models.py              # Pydantic models
+│   └── requirements.txt       # Dependencies
+├── logs/                      # Extraction and system logs
+├── notebooks/
+│   └── exploratory_analysis.ipynb  # Data exploration
+└── visualizations/            # Generated plots and charts
+```
   
