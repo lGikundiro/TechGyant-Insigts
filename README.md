@@ -2,6 +2,7 @@
 
 **Project**: AI-powered African startup recommendation system for tech investors
 
+
 ## Overview
 TechGyant Insights uses linear regression to predict investor readiness scores for African tech startups based on **real data extracted from TechGyant articles**, founder backgrounds, and market alignment data. The system automatically scrapes and updates data from the TechGyant website to ensure predictions are based on the latest startup information.
 
@@ -69,3 +70,8 @@ TechGyantInsights/
 
 Mobile Application GitHub:
 https://github.com/lGikundiro/TechGyant-Insights-Mobile-App.git
+
+**YouTube Demo**:https://youtu.be/YO684C8drWI
+
+Need to test my app?
+Express interest using my email:l.gikundiro@alustudent.com. Only APK is available at the moment.
