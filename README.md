@@ -1,4 +1,4 @@
-# TechGyant Insights - Investor Recommendation System
+# TechGyant Insights - Tech Investor Recommendations in Africa
 
 **Project**: AI-powered African startup recommendation system for tech investors
 
